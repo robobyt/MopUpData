@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -30,47 +31,37 @@ namespace MopUpData
         {
             InitializeComponent();
 
-            Binding binding = new Binding("Text");
-            binding.Source = apiHelper.apiResponse;
-            response.SetBinding(TextBlock.TextProperty, binding);
-
+          
         }
 
-        private void sendRequest_Click(object sender, RoutedEventArgs e)
+        private async void sendRequest_Click(object sender, RoutedEventArgs e)
         {
             _district = district.Text;
             _status = status.Text;
             _userName = userName.Text;
             _password = password.Text;
 
-            
             RunFSE(apiHelper);
+            textResult.Text += $"FSE response: { apiHelper.apiResponse }";
         }
-        //_userName, _password, _district, _status
         async Task RunFSE (APIHelper apiHelper)
         {
             var result = await apiHelper.CallFSE(_userName, _password, _district, _status, true);
-        }
+         }
 
         async Task UpdateFSE(APIHelper apiHelper)
         {
             var result = await apiHelper.UpdateTasks(_userName, _password);
         }
 
-        private void post_Click(object sender, RoutedEventArgs e)
+        private async void post_Click(object sender, RoutedEventArgs e)
         {
             _userName = userName.Text;
             _password = password.Text;
-
+            textResult.Text += $"FSE response: { apiHelper.apiResponse }";
             UpdateFSE(apiHelper);
+            textResult.Text += $"FSE response: { apiHelper.apiResponse }";
         }
-
-
-        private void response_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
-        {
-
-        }
-
         //private void district_Loaded(object sender, RoutedEventArgs e)
         //{
         //    district.Items.Add("HILLSBORO");
@@ -85,5 +76,6 @@ namespace MopUpData
             status.Items.Add("Arrived");
             status.Items.Add("EnRoute");
         }
+
     }
 }

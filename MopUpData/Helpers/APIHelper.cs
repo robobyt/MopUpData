@@ -58,8 +58,9 @@ namespace MopUpData.Helpers
             }
             else
             {
-                WriteLogs(response.ResponseStatus.ToString());
-                throw new Exception(response.ResponseStatus.ToString());
+                apiResponse = response.ResponseStatus.ToString();
+                WriteLogs(apiResponse);
+                throw new Exception(apiResponse);
             }
         }
         public async Task<string> UpdateTasks(string username, string password)
@@ -70,29 +71,31 @@ namespace MopUpData.Helpers
 
             request.AddHeader("Authorization", "Basic " + Convert.ToBase64String(Encoding.ASCII.GetBytes($"{username}:{password}")));
 
-            JObject jsonToSend = JObject.Parse(JObjectOutputTest(tasks));
+            apiResponse = "\n------- Updated " + _taskCount + " Tasks for district " + _district + " in Status " + _status;
+            WriteLogs(apiResponse);
+
+            JObject jsonToSend = JObject.Parse(JSONBuilder(tasks));
             request.AddParameter("application/json; charset=utf-8", jsonToSend, ParameterType.RequestBody);
             IRestResponse response = client.Execute(request);
+
             if (response.StatusCode == HttpStatusCode.OK)
             {
-                apiResponse = "\n------- Updated " + _taskCount + " Tasks for district " + _district + " in Status " + _status;
-                WriteLogs(apiResponse);
-
                 if (_taskCount < tasks.Count)
                 {
                     UpdateTasks(username, password);
                 }
-                WriteLogs(response.StatusDescription.ToString());
+                apiResponse = response.StatusDescription.ToString();
+                WriteLogs(apiResponse);
                 return response.Content;
             }
             else
             {
-                WriteLogs(response.ErrorMessage.ToString());
+                apiResponse = response.ErrorMessage.ToString();
+                WriteLogs(apiResponse);
                 throw new Exception(response.ResponseStatus.ToString());
             }
         }
 
-        [Obsolete]
         private void WriteLogs(string logs)
         {
             string path = @"C:\data\TaskList.txt";
@@ -103,7 +106,7 @@ namespace MopUpData.Helpers
          }
 
 
-        private string JObjectOutputTest(List<Task> tasks)
+        private string JSONBuilder(List<Task> tasks)
         {
             int count = 0;
 

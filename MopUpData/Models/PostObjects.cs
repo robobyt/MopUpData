@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace MopUpData.Models
 {
-    class PostObjects
+    public class PostObjects
     {
     }
     public class TaskColor

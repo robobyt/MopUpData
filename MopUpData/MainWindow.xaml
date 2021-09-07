@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MopUpData"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="594.094" Width="800">
     <Grid x:Name="Data_tool" AutomationProperties.Name="Data tool">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="73*"/>
@@ -14,18 +14,16 @@
         <Label x:Name="Mop_Up_Tool_" Content="Mop Up Tool" HorizontalAlignment="Left" Margin="256.228,24,0,0" VerticalAlignment="Top" Height="34" Width="134" FontFamily="Tahoma" FontSize="22" RenderTransformOrigin="1.314,0.48" Foreground="#FF0EA9F1" Grid.Column="1"/>
         <CheckBox x:Name="Sand_box" Content="Sand box" HorizontalAlignment="Left" Margin="51,72,0,0" VerticalAlignment="Top" FontSize="20" FontFamily="Segoe UI Black" IsChecked="True" Background="Transparent" BorderBrush="Transparent" Foreground="#FF0EA9F1" Grid.ColumnSpan="2"/>
         <Label x:Name="UserName" Content="User Name" HorizontalAlignment="Left" Margin="51,115,0,0" VerticalAlignment="Top" Width="130" FontSize="20" Foreground="#FF0EA9F1" Grid.ColumnSpan="2"/>
-        <Label x:Name="Password" Content="Password" HorizontalAlignment="Left" Margin="51,152,0,0" VerticalAlignment="Top" Width="130" FontSize="20" Foreground="#FF0EA9F1" Grid.ColumnSpan="2"/>
-        <Label x:Name="District" Content="District" HorizontalAlignment="Left" Margin="51,189,0,0" VerticalAlignment="Top" Width="130" FontSize="20" RenderTransformOrigin="0.495,-0.392" Foreground="#FF0EA9F1" Grid.ColumnSpan="2"/>
-        <Label x:Name="Status" Content="Status" HorizontalAlignment="Left" Margin="51,226,0,0" VerticalAlignment="Top" Width="130" FontSize="20" RenderTransformOrigin="0.522,-0.498" Foreground="#FF0EA9F1" Grid.ColumnSpan="2"/>
+        <Label x:Name="Password" Content="Password" HorizontalAlignment="Left" Margin="51,164,0,0" VerticalAlignment="Top" Width="130" FontSize="20" Foreground="#FF0EA9F1" Grid.ColumnSpan="2"/>
+        <Label x:Name="District" Content="District" HorizontalAlignment="Left" Margin="341,119,0,0" VerticalAlignment="Top" Width="130" FontSize="20" RenderTransformOrigin="0.495,-0.392" Foreground="#FF0EA9F1" Grid.Column="1"/>
+        <Label x:Name="Status" Content="Status" HorizontalAlignment="Left" Margin="341,161,0,0" VerticalAlignment="Top" Width="130" FontSize="20" RenderTransformOrigin="0.522,-0.498" Foreground="#FF0EA9F1" Grid.Column="1"/>
         <TextBox x:Name="userName" HorizontalAlignment="Left" Height="32" Margin="113,129,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="196" FontSize="20" RenderTransformOrigin="0.336,-1.193" Grid.Column="1"/>
-        <TextBox x:Name="password" HorizontalAlignment="Left" Height="33" Margin="113,166,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="196" FontSize="20" RenderTransformOrigin="0.336,-1.193" Grid.Column="1"/>
-        <ComboBox x:Name="status" HorizontalAlignment="Left" Margin="113,241,0,0" VerticalAlignment="Top" Width="196" RenderTransformOrigin="1.076,0.703" Grid.Column="1" Loaded="status_Loaded" Height="33"/>
-        <StackPanel HorizontalAlignment="Left" Height="254" Margin="436.228,86,0,0" VerticalAlignment="Top" Width="154" Grid.Column="1">
-            <TextBox x:Name="response" Height="254" TextWrapping="Wrap" FontSize="20" DataContextChanged="response_DataContextChanged"/>
-        </StackPanel>
-        <Button x:Name="sendRequest" Content="Send Request" HorizontalAlignment="Left" Margin="51,289,0,0" VerticalAlignment="Top" Width="130" Height="51" FontSize="20" Grid.ColumnSpan="2" Click="sendRequest_Click"/>
-        <Button x:Name="post" Content="Update" HorizontalAlignment="Left" Margin="179.228,289,0,0" VerticalAlignment="Top" Width="130" Height="51" FontSize="20" Grid.Column="1" Click="post_Click"/>
-        <TextBox x:Name="district" Grid.Column="1" HorizontalAlignment="Left" Height="31" Margin="113,204,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="196"/>
+        <TextBox x:Name="password" HorizontalAlignment="Left" Height="33" Margin="113,168,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="196" FontSize="20" RenderTransformOrigin="0.336,-1.193" Grid.Column="1"/>
+        <ComboBox x:Name="status" HorizontalAlignment="Left" Margin="471,168,0,0" VerticalAlignment="Top" Width="196" RenderTransformOrigin="1.076,0.703" Grid.Column="1" Loaded="status_Loaded" Height="33" FontSize="20" />
+        <Button x:Name="sendRequest" Content="Send Request" HorizontalAlignment="Left" Margin="60,267,0,0" VerticalAlignment="Top" Width="130" Height="51" FontSize="20" Click="sendRequest_Click" Grid.Column="1"/>
+        <Button x:Name="post" Content="Update" HorizontalAlignment="Left" Margin="471,267,0,0" VerticalAlignment="Top" Width="130" Height="51" FontSize="20" Grid.Column="1" Click="post_Click"/>
+        <TextBox x:Name="district" Grid.Column="1" HorizontalAlignment="Left" Height="31" Margin="471,121,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="196" FontSize="20"/>
+        <TextBlock x:Name="textResult" HorizontalAlignment="Left" Margin="60,335,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="176" Width="697" Grid.ColumnSpan="2" FontSize="16"/>
 
     </Grid>
 </Window>
