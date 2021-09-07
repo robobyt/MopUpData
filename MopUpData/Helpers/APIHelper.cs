@@ -69,24 +69,26 @@ namespace MopUpData.Helpers
             client.Timeout = -1;
             var request = new RestRequest(Method.POST);
 
+            request.AddHeader("Authorization", "Basic " + Convert.ToBase64String(Encoding.ASCII.GetBytes($"{username}:{password}")));
+
             JObject jsonToSend = JObject.Parse(JSONBuilder(tasks));
             request.AddParameter("application/json; charset=utf-8", jsonToSend, ParameterType.RequestBody);
             IRestResponse response = client.Execute(request);
-
             if (response.StatusCode == HttpStatusCode.OK)
             {
+                apiResponse = "\n------- Updated " + _taskCount + " Tasks for district " + _district + " in Status " + _status;
+                WriteLogs(apiResponse);
+
                 if (_taskCount < tasks.Count)
                 {
                     UpdateTasks(username, password);
                 }
-                apiResponse = response.StatusDescription.ToString();
-                WriteLogs(apiResponse);
+                WriteLogs(response.StatusDescription.ToString());
                 return response.Content;
             }
             else
             {
-                apiResponse = response.Content.ToString();
-                WriteLogs(apiResponse);
+                WriteLogs(response.ErrorMessage.ToString());
                 throw new Exception(response.ResponseStatus.ToString());
             }
         }
