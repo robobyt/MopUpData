@@ -58,7 +58,7 @@ namespace MopUpData.Helpers
             }
             else
             {
-                apiResponse = response.ResponseStatus.ToString();
+                apiResponse = response.StatusDescription.ToString();
                 WriteLogs(apiResponse);
                 throw new Exception(apiResponse);
             }
@@ -68,11 +68,6 @@ namespace MopUpData.Helpers
             var client = new RestClient($"https://fse-na-sb-int01.cloud.clicksoftware.com/so/api/Services/Integration/ServiceOptimization/ExecuteMultipleOperations"); ;
             client.Timeout = -1;
             var request = new RestRequest(Method.POST);
-
-            request.AddHeader("Authorization", "Basic " + Convert.ToBase64String(Encoding.ASCII.GetBytes($"{username}:{password}")));
-
-            apiResponse = "\n------- Updated " + _taskCount + " Tasks for district " + _district + " in Status " + _status;
-            WriteLogs(apiResponse);
 
             JObject jsonToSend = JObject.Parse(JSONBuilder(tasks));
             request.AddParameter("application/json; charset=utf-8", jsonToSend, ParameterType.RequestBody);
@@ -90,7 +85,7 @@ namespace MopUpData.Helpers
             }
             else
             {
-                apiResponse = response.ErrorMessage.ToString();
+                apiResponse = response.Content.ToString();
                 WriteLogs(apiResponse);
                 throw new Exception(response.ResponseStatus.ToString());
             }

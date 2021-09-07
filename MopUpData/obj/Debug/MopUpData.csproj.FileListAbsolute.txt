@@ -1,7 +1,6 @@
 C:\Users\kvant\source\repos\MopUpData\MopUpData\bin\Debug\MopUpData.exe.config
 C:\Users\kvant\source\repos\MopUpData\MopUpData\bin\Debug\MopUpData.exe
 C:\Users\kvant\source\repos\MopUpData\MopUpData\bin\Debug\MopUpData.pdb
-C:\Users\kvant\source\repos\MopUpData\MopUpData\obj\Debug\MopUpData.csprojAssemblyReference.cache
 C:\Users\kvant\source\repos\MopUpData\MopUpData\obj\Debug\MainWindow.g.cs
 C:\Users\kvant\source\repos\MopUpData\MopUpData\obj\Debug\App.g.cs
 C:\Users\kvant\source\repos\MopUpData\MopUpData\obj\Debug\MopUpData_MarkupCompile.cache
@@ -36,3 +35,4 @@ C:\Users\kvant\source\repos\MopUpData\MopUpData\bin\Debug\System.Text.Json.xml
 C:\Users\kvant\source\repos\MopUpData\MopUpData\bin\Debug\System.Threading.Tasks.Extensions.xml
 C:\Users\kvant\source\repos\MopUpData\MopUpData\bin\Debug\System.ValueTuple.xml
 C:\Users\kvant\source\repos\MopUpData\MopUpData\obj\Debug\MopUpData.csproj.CopyComplete
+C:\Users\kvant\source\repos\MopUpData\MopUpData\obj\Debug\MopUpData.csprojAssemblyReference.cache

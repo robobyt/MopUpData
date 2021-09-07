@@ -30,8 +30,6 @@ namespace MopUpData
         public MainWindow()
         {
             InitializeComponent();
-
-          
         }
 
         private async void sendRequest_Click(object sender, RoutedEventArgs e)
@@ -40,16 +38,15 @@ namespace MopUpData
             _status = status.Text;
             _userName = userName.Text;
             _password = password.Text;
-
-            RunFSE(apiHelper);
-            textResult.Text += $"FSE response: { apiHelper.apiResponse }";
+            RunFSE();
+            textResult.Text = textResult.Text.Insert(0, $"\n FSE response: { apiHelper.apiResponse }");
         }
-        async Task RunFSE (APIHelper apiHelper)
+        async Task RunFSE ()
         {
             var result = await apiHelper.CallFSE(_userName, _password, _district, _status, true);
          }
 
-        async Task UpdateFSE(APIHelper apiHelper)
+        async Task UpdateFSE()
         {
             var result = await apiHelper.UpdateTasks(_userName, _password);
         }
@@ -58,9 +55,8 @@ namespace MopUpData
         {
             _userName = userName.Text;
             _password = password.Text;
-            textResult.Text += $"FSE response: { apiHelper.apiResponse }";
-            UpdateFSE(apiHelper);
-            textResult.Text += $"FSE response: { apiHelper.apiResponse }";
+            UpdateFSE();
+            textResult.Text = textResult.Text.Insert(0, $"\n FSE response: { apiHelper.apiResponse }");
         }
         //private void district_Loaded(object sender, RoutedEventArgs e)
         //{
