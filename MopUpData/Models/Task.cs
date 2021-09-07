@@ -10,5 +10,6 @@ namespace MopUpData.Models
     {
         public string CallID { get; set; }
         public int Number { get; set; }
-    }
+
+     }
 }

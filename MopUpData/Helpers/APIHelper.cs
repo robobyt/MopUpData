@@ -27,11 +27,16 @@ namespace MopUpData.Helpers
         private string _district;
         private string _status;
         private int _taskCount = 0;
-        
-        private List<Task> tasks;
+
+        private int startNumber = 0;
+        private int topNumber =500;
+        private int overalCounts = 0;
+
+        private List<Task> tasksOveralAmount = new List<Task>();
         private int _tasksToUpdate = 0;
         const string sbLink = "https://fse-na-sb-int01";
         const string prodLink = "https://fse-na-int01";
+        //ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
 
         public async Task<string> CallFSE(string username, string password, string district, string status, bool isSandBox)
         {
@@ -39,8 +44,10 @@ namespace MopUpData.Helpers
             _district = district;
             _status = status;
 
-            var client = new RestClient($"https://fse-na-sb-int01.cloud.clicksoftware.com/SO/api/objects/Task?$filter=District/Name eq '{district}' and Status/Name eq '{status}'"); ;
+            var client = new RestClient($"https://fse-na-sb-int01.cloud.clicksoftware.com/SO/api/objects/Task?$select=CallID,Number,District&filter=Status/Name eq '{status}' and District/Name eq '{district}'&$count=true&$skip={startNumber}&$top={topNumber}"); 
             client.Timeout = -1;
+            apiResponse = "\n-------------" + DateTime.Now.ToString() + "------------ \n" + "------- Sending request for " + startNumber + " out of " + overalCounts;
+            WriteLogs(apiResponse);
             var request = new RestRequest(Method.GET);
 
             request.AddHeader("Authorization", "Basic " + Convert.ToBase64String(Encoding.ASCII.GetBytes($"{username}:{password}")));
@@ -48,11 +55,25 @@ namespace MopUpData.Helpers
 
             if (response.StatusCode == HttpStatusCode.OK)
             {
+                overalCounts = Int32.Parse(JObject.Parse(response.Content).SelectToken("Count").ToString());
+                string items = JObject.Parse(response.Content).SelectToken("Items").ToString();
 
-                tasks = JsonConvert.DeserializeObject<List<Task>>(response.Content);
-                _tasksToUpdate = tasks.Count;
-                apiResponse = "\n-------------" + DateTime.Now.ToString() + "------------ \n" + "------- Recieved " + _tasksToUpdate + " Tasks for district " + _district + " in Status " + _status;
-                WriteLogs(apiResponse);
+                List<Task> tasks = new List<Task>();
+                tasks = JsonConvert.DeserializeObject<List<Task>>(items);
+                
+                tasksOveralAmount.AddRange(tasks);
+
+                _tasksToUpdate = tasksOveralAmount.Count;
+
+                //apiResponse = "\n-------------" + DateTime.Now.ToString() + "------------ \n" + "------- Recieved " + _tasksToUpdate + " Tasks for district " + _district + " in Status " + _status;
+                //WriteLogs(apiResponse);
+
+                if (startNumber < overalCounts)
+                {
+                    startNumber += topNumber;
+                    CallFSE(username, password, district, status, isSandBox);
+                    
+                }
 
                 return response.Content;
             }
@@ -71,15 +92,16 @@ namespace MopUpData.Helpers
 
             request.AddHeader("Authorization", "Basic " + Convert.ToBase64String(Encoding.ASCII.GetBytes($"{username}:{password}")));
 
-            JObject jsonToSend = JObject.Parse(JSONBuilder(tasks));
-            request.AddParameter("application/json; charset=utf-8", jsonToSend, ParameterType.RequestBody);
+            JObject jsonToSend = JObject.Parse(JSONBuilder(tasksOveralAmount));
+
+            apiResponse = "\n-------------" + DateTime.Now.ToString() + "------------ \n" + "------- Updatad " + _taskCount + " out of " + overalCounts;
+            WriteLogs(apiResponse);
+
             IRestResponse response = client.Execute(request);
             if (response.StatusCode == HttpStatusCode.OK)
             {
-                apiResponse = "\n------- Updated " + _taskCount + " Tasks for district " + _district + " in Status " + _status;
-                WriteLogs(apiResponse);
 
-                if (_taskCount < tasks.Count)
+                if (_taskCount < tasksOveralAmount.Count)
                 {
                     UpdateTasks(username, password);
                 }
@@ -88,8 +110,9 @@ namespace MopUpData.Helpers
             }
             else
             {
-                WriteLogs(response.ErrorMessage.ToString());
-                throw new Exception(response.ResponseStatus.ToString());
+                apiResponse = response.StatusDescription.ToString();
+                WriteLogs(apiResponse);
+                throw new Exception(apiResponse);
             }
         }
 
@@ -117,7 +140,7 @@ namespace MopUpData.Helpers
 
             for (int i = _taskCount; i < tasks.Count; i++)
             {
-             if(count < 99 && count < tasks.Count)
+                if (count < 99 && _taskCount < tasks.Count)
                 {
                     var operation = new Operation()
                     {
@@ -137,7 +160,7 @@ namespace MopUpData.Helpers
                     root.Operations.Add(operation);
                     count++;
                 }
-                
+
             }
             _taskCount = _taskCount + count;
             var tasksToUpdate = JsonConvert.SerializeObject(root);
@@ -145,7 +168,7 @@ namespace MopUpData.Helpers
 
         }
     }
-    
+
 }
 
 

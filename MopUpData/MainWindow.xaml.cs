@@ -41,14 +41,15 @@ namespace MopUpData
             RunFSE();
             textResult.Text = textResult.Text.Insert(0, $"\n FSE response: { apiHelper.apiResponse }");
         }
+        //_userName, _password, _district, _status,
         async Task RunFSE ()
         {
-            var result = await apiHelper.CallFSE(_userName, _password, _district, _status, true);
+            var result = await apiHelper.CallFSE("q160659@amerenD2", "Sep@2021", "HILLSBORO", "Unassigned", true);
          }
 
         async Task UpdateFSE()
         {
-            var result = await apiHelper.UpdateTasks(_userName, _password);
+            var result = await apiHelper.UpdateTasks("q160659@amerenD2", "Sep@2021");
         }
 
         private async void post_Click(object sender, RoutedEventArgs e)
