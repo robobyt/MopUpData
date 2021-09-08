@@ -44,12 +44,12 @@ namespace MopUpData
         //_userName, _password, _district, _status,
         async Task RunFSE ()
         {
-            var result = await apiHelper.CallFSE("q160659@amerenD2", "Sep@2021", "HILLSBORO", "Unassigned", true);
+            var result = await apiHelper.CallFSE("_userName, _password, _district, _status, true);
          }
 
         async Task UpdateFSE()
         {
-            var result = await apiHelper.UpdateTasks("q160659@amerenD2", "Sep@2021");
+            var result = await apiHelper.UpdateTasks("_userName, _password,");
         }
 
         private async void post_Click(object sender, RoutedEventArgs e)
