@@ -44,12 +44,20 @@ namespace MopUpData
         //_userName, _password, _district, _status,
         async Task RunFSE ()
         {
+<<<<<<< HEAD
             var result = await apiHelper.CallFSE(_userName, _password, _district, _status, true);
+=======
+            var result = await apiHelper.CallFSE("_userName, _password, _district, _status, true);
+>>>>>>> 3ed61c90e4d4486b03bb863cd54bc89d24525c23
          }
 
         async Task UpdateFSE()
         {
+<<<<<<< HEAD
             var result = await apiHelper.UpdateTasks(_userName, _password);
+=======
+            var result = await apiHelper.UpdateTasks("_userName, _password,");
+>>>>>>> 3ed61c90e4d4486b03bb863cd54bc89d24525c23
         }
 
         private async void post_Click(object sender, RoutedEventArgs e)
