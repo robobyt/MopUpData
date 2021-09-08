@@ -36,11 +36,11 @@ namespace MopUpData.Helpers
         private int _tasksToUpdate = 0;
         const string sbLink = "https://fse-na-sb-int01";
         const string prodLink = "https://fse-na-int01";
-        //ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
+        //
 
         public async Task<string> CallFSE(string username, string password, string district, string status, bool isSandBox)
         {
-
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
             _district = district;
             _status = status;
 
@@ -72,7 +72,7 @@ namespace MopUpData.Helpers
                 {
                     startNumber += topNumber;
                     CallFSE(username, password, district, status, isSandBox);
-                    
+
                 }
 
                 return response.Content;
@@ -86,17 +86,19 @@ namespace MopUpData.Helpers
         }
         public async Task<string> UpdateTasks(string username, string password)
         {
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
             var client = new RestClient($"https://fse-na-sb-int01.cloud.clicksoftware.com/so/api/Services/Integration/ServiceOptimization/ExecuteMultipleOperations"); ;
             client.Timeout = -1;
+
+            apiResponse = "\n-------------" + DateTime.Now.ToString() + "------------ \n" + "------- Sent update for " + _taskCount + " out of " + overalCounts;
+            WriteLogs(apiResponse);
+
             var request = new RestRequest(Method.POST);
 
             request.AddHeader("Authorization", "Basic " + Convert.ToBase64String(Encoding.ASCII.GetBytes($"{username}:{password}")));
 
             JObject jsonToSend = JObject.Parse(JSONBuilder(tasksOveralAmount));
-
-            apiResponse = "\n-------------" + DateTime.Now.ToString() + "------------ \n" + "------- Updatad " + _taskCount + " out of " + overalCounts;
-            WriteLogs(apiResponse);
-
+            request.AddParameter("application/json; charset=utf-8", jsonToSend, ParameterType.RequestBody);
             IRestResponse response = client.Execute(request);
             if (response.StatusCode == HttpStatusCode.OK)
             {
@@ -110,7 +112,7 @@ namespace MopUpData.Helpers
             }
             else
             {
-                apiResponse = response.StatusDescription.ToString();
+                apiResponse = response.Content.ToString();
                 WriteLogs(apiResponse);
                 throw new Exception(apiResponse);
             }
