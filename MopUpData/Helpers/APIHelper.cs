@@ -1,22 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RestSharp;
-using System.Diagnostics;
 using System.IO;
 using System.Net;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Text.Json;
-using System.Text.RegularExpressions;
 using MopUpData.Models;
-using Task = MopUpData.Models.Task;
+using TaskFSE = MopUpData.Models.TaskFSE;
 using Object = MopUpData.Models.Object;
-using System.Configuration;
+using System.Threading;
 
 namespace MopUpData.Helpers
 {
@@ -25,98 +19,194 @@ namespace MopUpData.Helpers
     {
         public string apiResponse;
         private string _district;
-        private string _status;
-        private int _taskCount = 0;
+        private string _status = null;
+        //private int _taskCount = 0;
 
         private int startNumber = 0;
         private int topNumber =500;
-        private int overalCounts = 0;
+        private int overalCounts;
+        private string _username;
+        private string _password;
+        private bool _isSandBox;
 
-        private List<Task> tasksOveralAmount = new List<Task>();
-        private int _tasksToUpdate = 0;
-        const string sbLink = "https://fse-na-sb-int01";
-        const string prodLink = "https://fse-na-int01";
-        //
+        private List<TaskFSE> tasksOveralAmount;
+        
+        const string sbLink = "https://fse-na-sb-int01.cloud.clicksoftware.com";
+        const string prodLink = "https://fse-na.cloud.clicksoftware.com";
+        private string requestString;
+        private string link = prodLink;
 
-        public async Task<string> CallFSE(string username, string password, string district, string status, bool isSandBox)
+        public void CallFSE(string username, string password, string status, bool isSandBox)
         {
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
-            _district = district;
             _status = status;
+            _username = username;
+            _password = password;
+            _isSandBox = isSandBox;
+            tasksOveralAmount = new List<TaskFSE>();
 
-            var client = new RestClient($"https://fse-na-sb-int01.cloud.clicksoftware.com/SO/api/objects/Task?$select=CallID,Number,District&filter=Status/Name eq '{status}' and District/Name eq '{district}'&$count=true&$skip={startNumber}&$top={topNumber}"); 
-            client.Timeout = -1;
+            overalCounts = 0;
+
+            requestString = $"/SO/api/objects/Task?&$filter=TaskColor/Key eq -1 and Status/Name eq '{_status}'&$select=CallID,Number&$count=true&$skip={startNumber}&$top={topNumber}";
+
+            if (_isSandBox)
+            {
+                link = sbLink;
+            }
+
+            overalCounts = GetTotalTaskCount();
+
+            if (overalCounts < 0)
+            {
+                throw new Exception("No Tasks for update");
+            }
+
+            ProgressBarModel report = new ProgressBarModel();
+            List<Task<string>> asyncTasks = new List<Task<string>>();
+
+            var watch = System.Diagnostics.Stopwatch.StartNew();
+
+            while (startNumber < overalCounts)
+            {
+                var tasks = CreateTaskList(startNumber);
+                tasksOveralAmount.AddRange(tasks);
+                startNumber += topNumber;
+
+                if (startNumber > overalCounts)
+                {
+                    startNumber = overalCounts;
+                }
+            }
+
+            var timeExecution = watch.ElapsedMilliseconds;
+            TimeSpan t = TimeSpan.FromMilliseconds(timeExecution);
+            string answer = string.Format("{0:D2}h:{1:D2}m:{2:D2}s", t.Hours, t.Minutes, t.Seconds);
+
+            apiResponse = "\n-------------" + DateTime.Now.ToString() + "------------ \n" + "------- Recieved Tasks for update: " + overalCounts + " \n Server respons:  ";
+            WriteLogs(apiResponse);
+        }
+
+        private List<TaskFSE> CreateTaskList(int startNumber)
+        {
+            List<TaskFSE> tasks = new List<TaskFSE>();
+            var tasksResponse = GetTask(startNumber);
+
+            string items = JObject.Parse(tasksResponse.Result).SelectToken("Items").ToString();
+            tasks = JsonConvert.DeserializeObject<List<TaskFSE>>(items);
+            
             apiResponse = "\n-------------" + DateTime.Now.ToString() + "------------ \n" + "------- Sending request for " + startNumber + " out of " + overalCounts;
             WriteLogs(apiResponse);
+
+            return tasks;
+        }
+
+
+        public async Task<string> UpdateTasksInParallel()
+        {
+            if(overalCounts <= 0)
+            {
+                throw new Exception("No Tasks recieved from FSE");
+            }
+            //string response = null;
+            int _taskCount = 0;
+            List<Task<string>> asyncTasks = new List<Task<string>>();
+
+            var watch = System.Diagnostics.Stopwatch.StartNew();
+            while (_taskCount < overalCounts)
+            {
+                var task = UpdateTaskAsync(tasksOveralAmount, _taskCount);
+                asyncTasks.Add(task);
+                _taskCount += 99;
+            }
+            var results = await Task.WhenAll(asyncTasks);
+
+            var timeExecution = watch.ElapsedMilliseconds;
+            TimeSpan t = TimeSpan.FromMilliseconds(timeExecution);
+            string answer = string.Format("{0:D2}h:{1:D2}m:{2:D2}s", t.Hours, t.Minutes, t.Seconds);
+
+            apiResponse = "\n-------------Time:  " + t + "------------ \n" + _taskCount + "------- Tasks were sent for update the TaskColor to  " + _status + " updated ";
+            WriteLogs(apiResponse);
+            return results[0];
+        }
+        private int GetTotalTaskCount()
+        {
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
+
+            var client = new RestClient($"{link}{requestString}");
+            client.Timeout = -1;
+
             var request = new RestRequest(Method.GET);
 
-            request.AddHeader("Authorization", "Basic " + Convert.ToBase64String(Encoding.ASCII.GetBytes($"{username}:{password}")));
+            request.AddHeader("Authorization", "Basic " + Convert.ToBase64String(Encoding.ASCII.GetBytes($"{_username}:{_password}")));
             IRestResponse response = client.Execute(request);
 
             if (response.StatusCode == HttpStatusCode.OK)
             {
                 overalCounts = Int32.Parse(JObject.Parse(response.Content).SelectToken("Count").ToString());
-                string items = JObject.Parse(response.Content).SelectToken("Items").ToString();
 
-                List<Task> tasks = new List<Task>();
-                tasks = JsonConvert.DeserializeObject<List<Task>>(items);
-                
-                tasksOveralAmount.AddRange(tasks);
-
-                _tasksToUpdate = tasksOveralAmount.Count;
-
-                //apiResponse = "\n-------------" + DateTime.Now.ToString() + "------------ \n" + "------- Recieved " + _tasksToUpdate + " Tasks for district " + _district + " in Status " + _status;
-                //WriteLogs(apiResponse);
-
-                if (startNumber < overalCounts)
-                {
-                    startNumber += topNumber;
-                    CallFSE(username, password, district, status, isSandBox);
-
-                }
-
-                return response.Content;
+                apiResponse = "\n-------------" + DateTime.Now.ToString() + "------------ \n" + "------- Overal Tasks coount " + overalCounts + " \n Server respons:  " + response.StatusCode;
+                WriteLogs(apiResponse);
             }
             else
             {
-                apiResponse = response.StatusDescription.ToString();
+                overalCounts = 0;
+                apiResponse = "\n-------------" + DateTime.Now.ToString() + "------------ \n" + "------- Overal Tasks coount " + overalCounts + " \n Server respons:  " + response.StatusCode;
                 WriteLogs(apiResponse);
-                throw new Exception(apiResponse);
             }
+                
+
+            return overalCounts;
         }
-        public async Task<string> UpdateTasks(string username, string password)
+
+        private async Task<string> GetTask(int startNumber)
         {
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
-            var client = new RestClient($"https://fse-na-sb-int01.cloud.clicksoftware.com/so/api/Services/Integration/ServiceOptimization/ExecuteMultipleOperations"); ;
+
+            var client = new RestClient($"{link}/SO/api/objects/Task?&$filter=TaskColor/Key eq -1 and Status/Name eq '{_status}'&$select=CallID,Number&$count=true&$skip={startNumber}&$top={topNumber}");
             client.Timeout = -1;
 
-            apiResponse = "\n-------------" + DateTime.Now.ToString() + "------------ \n" + "------- Sent update for " + _taskCount + " out of " + overalCounts;
-            WriteLogs(apiResponse);
+            var request = new RestRequest(Method.GET);
 
-            var request = new RestRequest(Method.POST);
+            request.AddHeader("Authorization", "Basic " + Convert.ToBase64String(Encoding.ASCII.GetBytes($"{_username}:{_password}")));
 
-            request.AddHeader("Authorization", "Basic " + Convert.ToBase64String(Encoding.ASCII.GetBytes($"{username}:{password}")));
-
-            JObject jsonToSend = JObject.Parse(JSONBuilder(tasksOveralAmount));
-            request.AddParameter("application/json; charset=utf-8", jsonToSend, ParameterType.RequestBody);
             IRestResponse response = client.Execute(request);
-            if (response.StatusCode == HttpStatusCode.OK)
-            {
 
-                if (_taskCount < tasksOveralAmount.Count)
-                {
-                    UpdateTasks(username, password);
-                }
-                WriteLogs(response.StatusDescription.ToString());
+            if (response.StatusCode == HttpStatusCode.OK)
+            {                
+                apiResponse = "\n-------------" + DateTime.Now.ToString() + "------------ \n" + "------- Overal Tasks coount " + overalCounts + " \n Server respons:  " + response.StatusCode;
+                WriteLogs(apiResponse);
                 return response.Content;
             }
             else
             {
-                apiResponse = response.Content.ToString();
-                WriteLogs(apiResponse);
-                throw new Exception(apiResponse);
+                apiResponse = "\n-------------" + DateTime.Now.ToString() + "------------ \n" + "------- Overal Tasks coount " + overalCounts + " \n Server respons:  " + response.StatusCode;
+                throw new Exception("Server response error: " + response.Content);
             }
+
         }
+
+
+        private async Task<string> UpdateTaskAsync(List<TaskFSE> tasks, int _taskCount) {
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
+
+            JObject jsonToSend = JObject.Parse(JSONBuilder(tasks, _taskCount));
+
+            var client = new RestClient($"{link}/so/api/Services/Integration/ServiceOptimization/ExecuteMultipleOperations");
+            client.Timeout = -1;
+
+            var request = new RestRequest(Method.POST);
+            request.AddHeader("Authorization", "Basic " + Convert.ToBase64String(Encoding.ASCII.GetBytes($"{_username}:{_password}")));
+            request.AddParameter("application/json; charset=utf-8", jsonToSend, ParameterType.RequestBody);
+
+            var cancellationTokenSource = new CancellationTokenSource();
+            var restResponse = await client.ExecuteAsync(request, cancellationTokenSource.Token);
+
+            apiResponse = "\n-------------" + DateTime.Now.ToString() + "------------ \n" + "------- Server respons " + restResponse.StatusCode + " updated " + _taskCount;
+            WriteLogs(apiResponse);
+
+            return restResponse.Content;
+
+        }        
 
         private void WriteLogs(string logs)
         {
@@ -128,7 +218,7 @@ namespace MopUpData.Helpers
          }
 
 
-        private string JSONBuilder(List<Task> tasks)
+        private string JSONBuilder(List<TaskFSE> tasks, int _taskCount)
         {
             int count = 0;
 
@@ -146,7 +236,7 @@ namespace MopUpData.Helpers
                 {
                     var operation = new Operation()
                     {
-                        Action = "CreateOrUpdate",
+                        Action = "Update",
                         Object = new Object()
                         {
                             ObjectType = "Task",
@@ -164,7 +254,6 @@ namespace MopUpData.Helpers
                 }
 
             }
-            _taskCount = _taskCount + count;
             var tasksToUpdate = JsonConvert.SerializeObject(root);
             return tasksToUpdate;
 

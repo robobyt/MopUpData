@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MopUpData.Models
 {
-    class Task
+    class TaskFSE
     {
         public string CallID { get; set; }
         public int Number { get; set; }

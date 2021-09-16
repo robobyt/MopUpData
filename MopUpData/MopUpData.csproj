@@ -106,7 +106,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Models\PostObjects.cs" />
-    <Compile Include="Models\Task.cs" />
+    <Compile Include="Models\ProgressBarModel.cs" />
+    <Compile Include="Models\TaskFSE.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>

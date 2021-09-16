@@ -6,24 +6,23 @@
         xmlns:local="clr-namespace:MopUpData"
         mc:Ignorable="d"
         Title="MainWindow" Height="594.094" Width="800">
-    <Grid x:Name="Data_tool" AutomationProperties.Name="Data tool">
+    <Grid x:Name="Data_tool" AutomationProperties.Name="Data tool" Margin="0,0,0,-45">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="73*"/>
             <ColumnDefinition Width="719*"/>
         </Grid.ColumnDefinitions>
-        <Label x:Name="Mop_Up_Tool_" Content="Mop Up Tool" HorizontalAlignment="Left" Margin="256.228,24,0,0" VerticalAlignment="Top" Height="34" Width="134" FontFamily="Tahoma" FontSize="22" RenderTransformOrigin="1.314,0.48" Foreground="#FF0EA9F1" Grid.Column="1"/>
-        <CheckBox x:Name="Sand_box" Content="Sand box" HorizontalAlignment="Left" Margin="51,72,0,0" VerticalAlignment="Top" FontSize="20" FontFamily="Segoe UI Black" IsChecked="True" Background="Transparent" BorderBrush="Transparent" Foreground="#FF0EA9F1" Grid.ColumnSpan="2"/>
-        <Label x:Name="UserName" Content="User Name" HorizontalAlignment="Left" Margin="51,115,0,0" VerticalAlignment="Top" Width="130" FontSize="20" Foreground="#FF0EA9F1" Grid.ColumnSpan="2"/>
+        <Label x:Name="Mop_Up_Tool_" Content="Task Color Mop Up Tool" HorizontalAlignment="Left" Margin="177,24,0,0" VerticalAlignment="Top" Height="34" Width="260" FontFamily="Tahoma" FontSize="22" RenderTransformOrigin="1.314,0.48" Foreground="#FF0EA9F1" Grid.Column="1"/>
+        <CheckBox x:Name="sandBox" Content="Sand box" HorizontalAlignment="Left" Margin="489,81,0,0" VerticalAlignment="Top" FontSize="20" FontFamily="Segoe UI Black" IsChecked="False" Background="Transparent" BorderBrush="#FF0EA9F1" Foreground="#FF0EA9F1" RenderTransformOrigin="2.759,0.888" Grid.Column="1" />
+        <Label x:Name="UserName" Content="User Name" HorizontalAlignment="Left" Margin="51,122,0,0" VerticalAlignment="Top" Width="130" FontSize="20" Foreground="#FF0EA9F1" Grid.ColumnSpan="2"/>
         <Label x:Name="Password" Content="Password" HorizontalAlignment="Left" Margin="51,164,0,0" VerticalAlignment="Top" Width="130" FontSize="20" Foreground="#FF0EA9F1" Grid.ColumnSpan="2"/>
-        <Label x:Name="District" Content="District" HorizontalAlignment="Left" Margin="341,119,0,0" VerticalAlignment="Top" Width="130" FontSize="20" RenderTransformOrigin="0.495,-0.392" Foreground="#FF0EA9F1" Grid.Column="1"/>
-        <Label x:Name="Status" Content="Status" HorizontalAlignment="Left" Margin="341,161,0,0" VerticalAlignment="Top" Width="130" FontSize="20" RenderTransformOrigin="0.522,-0.498" Foreground="#FF0EA9F1" Grid.Column="1"/>
-        <TextBox x:Name="userName" HorizontalAlignment="Left" Height="32" Margin="113,129,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="196" FontSize="20" RenderTransformOrigin="0.336,-1.193" Grid.Column="1"/>
-        <TextBox x:Name="password" HorizontalAlignment="Left" Height="33" Margin="113,168,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="196" FontSize="20" RenderTransformOrigin="0.336,-1.193" Grid.Column="1"/>
-        <ComboBox x:Name="status" HorizontalAlignment="Left" Margin="471,168,0,0" VerticalAlignment="Top" Width="196" RenderTransformOrigin="1.076,0.703" Grid.Column="1" Loaded="status_Loaded" Height="33" FontSize="20" />
-        <Button x:Name="sendRequest" Content="Send Request" HorizontalAlignment="Left" Margin="60,267,0,0" VerticalAlignment="Top" Width="130" Height="51" FontSize="20" Click="sendRequest_Click" Grid.Column="1"/>
-        <Button x:Name="post" Content="Update" HorizontalAlignment="Left" Margin="471,267,0,0" VerticalAlignment="Top" Width="130" Height="51" FontSize="20" Grid.Column="1" Click="post_Click"/>
-        <TextBox x:Name="district" Grid.Column="1" HorizontalAlignment="Left" Height="31" Margin="471,121,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="196" FontSize="20"/>
-        <TextBlock x:Name="textResult" HorizontalAlignment="Left" Margin="60,335,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="176" Width="697" Grid.ColumnSpan="2" FontSize="16"/>
+        <Label x:Name="Status" Content="Status" HorizontalAlignment="Left" Margin="51,206,0,0" VerticalAlignment="Top" Width="130" FontSize="20" RenderTransformOrigin="0.522,-0.498" Foreground="#FF0EA9F1" Grid.ColumnSpan="2"/>
+        <TextBox x:Name="userName" HorizontalAlignment="Left" Height="32" Margin="113,129,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="402" FontSize="20" RenderTransformOrigin="0.336,-1.193" Grid.Column="1"/>
+        <TextBox x:Name="password" HorizontalAlignment="Left" Height="33" Margin="113,168,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="402" FontSize="20" RenderTransformOrigin="0.336,-1.193" Grid.Column="1"/>
+        <ComboBox x:Name="status" HorizontalAlignment="Left" Margin="113,206,0,0" VerticalAlignment="Top" Width="402" RenderTransformOrigin="1.076,0.703" Grid.Column="1" Loaded="status_Loaded" Height="33" FontSize="20" />
+        <Button x:Name="sendRequest" Content="Send Request" HorizontalAlignment="Left" Margin="113,267,0,0" VerticalAlignment="Top" Width="130" Height="51" FontSize="20" Click="sendRequest_Click" Grid.Column="1"/>
+        <Button x:Name="post" Content="Update" HorizontalAlignment="Left" Margin="385,267,0,0" VerticalAlignment="Top" Width="130" Height="51" FontSize="20" Grid.Column="1" Click="post_Click"/>
+        <TextBlock x:Name="textResult" HorizontalAlignment="Left" Margin="51,394,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="155" Width="697" Grid.ColumnSpan="2" FontSize="16"/>
+        <ProgressBar x:Name="dashboardProgress" Grid.Column="1" HorizontalAlignment="Left" Height="39" Margin="10,338,0,0" VerticalAlignment="Top" Width="591"/>
 
     </Grid>
 </Window>
