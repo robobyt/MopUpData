@@ -47,7 +47,7 @@ namespace MopUpData
 
             try
             {
-                apiHelper.CallFSE("q160659@amerensb", "Sep@2021", _status, _sandBox);
+                apiHelper.CallFSE(_userName, _password, _status, _sandBox);
                 watch.Stop();
                 var timeExecution = watch.ElapsedMilliseconds;
                 TimeSpan t = TimeSpan.FromMilliseconds(timeExecution);
