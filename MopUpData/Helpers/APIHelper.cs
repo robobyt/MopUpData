@@ -136,7 +136,7 @@ namespace MopUpData.Helpers
         {
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
 
-            var client = new RestClient($"{link}{requestString}");
+            var client = new RestClient($"{link}/SO/api/objects/Task?&$filter=TaskColor/Key eq -1 and Status/Name eq '{_status}'&$select=CallID,Number&$count=true&$skip={startNumber}&$top={topNumber}");
             client.Timeout = -1;
 
             var request = new RestRequest(Method.GET);
