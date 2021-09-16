@@ -36,6 +36,10 @@ namespace MopUpData.Helpers
         private string requestString;
         private string link = prodLink;
 
+
+        // Called by click "Send request" button. Captured credentials and the Status valu that will be used for query and as a TaskColor value
+        // isSandbox identifies the link for production or Sandbox env.
+        // First send a request to find the total count of Tasks that need to be updated. And next creates a list of objects that will be passed with the POST request. 
         public void CallFSE(string username, string password, string status, bool isSandBox)
         {
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
@@ -46,9 +50,7 @@ namespace MopUpData.Helpers
             tasksOveralAmount = new List<TaskFSE>();
 
             overalCounts = 0;
-
-            requestString = $"/SO/api/objects/Task?&$filter=TaskColor/Key eq -1 and Status/Name eq '{_status}'&$select=CallID,Number&$count=true&$skip={startNumber}&$top={topNumber}";
-
+ 
             if (_isSandBox)
             {
                 link = sbLink;
@@ -86,6 +88,7 @@ namespace MopUpData.Helpers
             WriteLogs(apiResponse);
         }
 
+        //Create the List of objects by calling FSE with 500 chank requests. Returs the List with lenght 500
         private List<TaskFSE> CreateTaskList(int startNumber)
         {
             List<TaskFSE> tasks = new List<TaskFSE>();
@@ -100,7 +103,7 @@ namespace MopUpData.Helpers
             return tasks;
         }
 
-
+        // sending the series of POST requests to updates the overal Counts of all Tasks recieved from GET request before. Each request updates 100 Tasks
         public async Task<string> UpdateTasksInParallel()
         {
             if(overalCounts <= 0)
@@ -116,7 +119,7 @@ namespace MopUpData.Helpers
             {
                 var task = UpdateTaskAsync(tasksOveralAmount, _taskCount);
                 asyncTasks.Add(task);
-                _taskCount += 99;
+                _taskCount += 100;
             }
             var results = await Task.WhenAll(asyncTasks);
 
@@ -128,6 +131,8 @@ namespace MopUpData.Helpers
             WriteLogs(apiResponse);
             return results[0];
         }
+
+        //Returns the number of Tasks to be updated
         private int GetTotalTaskCount()
         {
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
@@ -158,6 +163,7 @@ namespace MopUpData.Helpers
             return overalCounts;
         }
 
+        //Sends the GET request for 500 Tasks chank
         private async Task<string> GetTask(int startNumber)
         {
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
@@ -185,7 +191,7 @@ namespace MopUpData.Helpers
 
         }
 
-
+        //Sends the POST request for 100 Tasks chank
         private async Task<string> UpdateTaskAsync(List<TaskFSE> tasks, int _taskCount) {
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
 
@@ -208,6 +214,7 @@ namespace MopUpData.Helpers
 
         }        
 
+        //Write logs to the text file in the data forlder
         private void WriteLogs(string logs)
         {
             string path = @"C:\data\TaskList.txt";
@@ -217,7 +224,7 @@ namespace MopUpData.Helpers
             }
          }
 
-
+        //Creates a JSON from the Task list fro 100 objects
         private string JSONBuilder(List<TaskFSE> tasks, int _taskCount)
         {
             int count = 0;
