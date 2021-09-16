@@ -33,6 +33,7 @@ namespace MopUpData
             InitializeComponent();
         }
 
+        // Called by click "Send request" button. Captured credentials and the Status value that will be used for get query and as a TaskColor value
         private async void sendRequest_Click(object sender, RoutedEventArgs e)
         {
             _status = status.Text;

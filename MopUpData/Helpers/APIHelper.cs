@@ -37,9 +37,8 @@ namespace MopUpData.Helpers
         private string link = prodLink;
 
 
-        // Called by click "Send request" button. Captured credentials and the Status valu that will be used for query and as a TaskColor value
-        // isSandbox identifies the link for production or Sandbox env.
         // First send a request to find the total count of Tasks that need to be updated. And next creates a list of objects that will be passed with the POST request. 
+        // isSandbox identifies the link for production or Sandbox env.
         public void CallFSE(string username, string password, string status, bool isSandBox)
         {
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
